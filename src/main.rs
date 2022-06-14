@@ -12,20 +12,13 @@
     clippy::trivially_copy_pass_by_ref
 )]
 
-mod cmd;
-mod config;
-mod edit;
-mod error;
-mod fmt;
-mod opts;
-
-use crate::cmd::Line;
-use crate::config::Config;
-use crate::error::Result;
-use crate::opts::Coloring::*;
-use crate::opts::{Args, Coloring, Opts};
 use atty::Stream::{Stderr, Stdout};
 use bat::{PagingMode, PrettyPrinter};
+use cargo_expand::cmd::Line;
+use cargo_expand::config::Config;
+use cargo_expand::error::Result;
+use cargo_expand::opts::Coloring::*;
+use cargo_expand::opts::{Args, Coloring, Opts};
 use clap::Parser;
 use quote::quote;
 use std::env;
@@ -124,7 +117,7 @@ fn cargo_binary() -> OsString {
 
 fn cargo_expand() -> Result<i32> {
     let Opts::Expand(args) = Opts::parse();
-    let config = config::deserialize();
+    let config = cargo_expand::config::deserialize();
 
     if args.themes {
         for theme in PrettyPrinter::new().themes() {
@@ -205,7 +198,7 @@ fn cargo_expand() -> Result<i32> {
 
         // Discard comments, which are misplaced by the compiler
         if let Ok(mut syntax_tree) = syn::parse_file(&wip) {
-            edit::sanitize(&mut syntax_tree);
+            cargo_expand::edit::sanitize(&mut syntax_tree);
             if let Some(filter) = args.item {
                 syntax_tree.shebang = None;
                 syntax_tree.attrs.clear();
@@ -242,7 +235,7 @@ fn cargo_expand() -> Result<i32> {
             if let Some(rustfmt) = rustfmt.or_else(which_rustfmt) {
                 fs::write(&outfile_path, unformatted)?;
 
-                fmt::write_rustfmt_config(&outdir)?;
+                cargo_expand::fmt::write_rustfmt_config(&outdir)?;
 
                 for edition in &["2018", "2015"] {
                     let output = Command::new(&rustfmt)
