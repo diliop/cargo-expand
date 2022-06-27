@@ -14,7 +14,7 @@ autotests = false
 
 [dependencies]
 atty = "0.2"
-cargo-subcommand-metadata = "0.1"
+cargo-subcommand-metadata = { version = "0.1", optional = true }
 clap = { version = "3.2.5", default-features = false, features = ["deprecated", "derive", "std", "suggestions"] }
 prettyplease = { version = "0.1.13", optional = true, features = ["verbatim"] }
 proc-macro2 = "1.0"
@@ -24,12 +24,13 @@ syn-select = "0.2.1"
 tempfile = "3.0"
 termcolor = "1.0"
 toml = "0.5"
-toolchain_find = "0.2"
+toolchain_find = { version = "0.2", optional = true}
 
 [dependencies.bat]
 version = "0.21"
 default-features = false
 features = ["paging", "regex-fancy"]
+optional = true
 
 [dependencies.syn]
 version = "1.0"
@@ -41,3 +42,10 @@ targets = ["x86_64-unknown-linux-gnu"]
 
 [workspace]
 members = ["tests"]
+
+[features]
+build-binary = ["cargo-subcommand-metadata", "bat", "toolchain_find"]
+
+[[bin]]
+name = "cargo-expand"
+required-features = ["build-binary"]
